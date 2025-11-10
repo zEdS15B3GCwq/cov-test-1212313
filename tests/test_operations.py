@@ -1,6 +1,5 @@
 """Unit tests for testmodule."""
 
-import pytest
 from testmodule import add2
 
 
