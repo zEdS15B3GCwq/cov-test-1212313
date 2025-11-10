@@ -6,10 +6,15 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint with Ruff
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -29,6 +34,8 @@ jobs:
   test:
     name: Test with Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ["3.12", "3.13", "3.14"]
@@ -65,6 +72,8 @@ jobs:
   docs:
     name: Build Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
