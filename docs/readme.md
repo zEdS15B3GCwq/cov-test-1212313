@@ -38,7 +38,7 @@ This project uses:
 ### Running Tests
 
 ```bash
-# Run tests with coverage for all Python versions
+# Run tests with coverage
 nox -s tests
 
 # Or directly with pytest
