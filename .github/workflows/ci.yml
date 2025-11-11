@@ -6,37 +6,19 @@ on:
   pull_request:
     branches: ["main"]
 
-env:
-  PYTHON_MAIN_VERSION: "3.14"
-
 permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint with Ruff (Python ${{ env.PYTHON_MAIN_VERSION }})
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v7
-
-      - uses: wntrblm/nox@2025.10.16
-        with:
-          python-versions: ${{ env.PYTHON_MAIN_VERSION }}
-
-      - run: nox -s lint
-
   test:
-    name: Test with Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
     strategy:
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ["3.12", "3.13"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v5
@@ -49,27 +31,42 @@ jobs:
 
       - run: nox -s tests --python ${{ matrix.python-version }}
 
-      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
-        run: python ${{ github.workspace }}/.github/extract_coverage.py
+  test_with_coverage:
+    name: Test & Coverage (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy: *default-strategy
 
-      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
-        uses: actions/upload-artifact@v5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+
+      - uses: wntrblm/nox@2025.10.16
+        with:
+          python-versions: ${{ matrix.python-version }}
+
+      - run: nox -s tests_with_coverage --python ${{ matrix.python-version }}
+
+      - run: python ${{ github.workspace }}/.github/extract_coverage.py
+
+      - uses: actions/upload-artifact@v5
         with:
           name: coverage-badge
           path: badges/coverage.json
 
-      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
-        uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v5
         with:
           name: coverage-html
           path: htmlcov/
 
-
   docs:
-    name: Build and Deploy Documentation (Python ${{ env.PYTHON_MAIN_VERSION }})
-    runs-on: ubuntu-latest
+    name: Build & Deploy Docs (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: test
+    strategy: *default-strategy
+    needs: test_with_coverage
 
     concurrency:
       group: "pages"
@@ -87,9 +84,9 @@ jobs:
 
       - uses: wntrblm/nox@2025.10.16
         with:
-          python-versions: ${{ env.PYTHON_MAIN_VERSION }}
+          python-versions: ${{ matrix.python-version }}
 
-      - run: nox -s docs --python ${{ env.PYTHON_MAIN_VERSION }}
+      - run: nox -s docs --python ${{ matrix.python-version }}
 
       - uses: actions/download-artifact@v6
         with:
@@ -107,3 +104,23 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  lint:
+    name: Lint with Ruff (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy: &default-strategy
+      matrix:
+        python-version: "3.14"
+        os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+
+      - uses: wntrblm/nox@2025.10.16
+        with:
+          python-versions: ${{ matrix.python-version }}
+
+      - run: nox -s lint --python ${{ matrix.python-version }}
