@@ -12,6 +12,7 @@ runs:
     - uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
+        prune-cache: false
 
     - if: steps.setup-uv.outputs.cache-hit == 'true'
       run: echo "UV cache was restored"
