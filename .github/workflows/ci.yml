@@ -36,7 +36,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
-    strategy: *default-strategy
+    strategy: &default-strategy
+      matrix:
+        python-version: "3.14"
+        os: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
@@ -110,10 +113,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
-    strategy: &default-strategy
-      matrix:
-        python-version: "3.14"
-        os: ubuntu-latest
+    strategy: *default-strategy
     steps:
       - uses: actions/checkout@v5
 
