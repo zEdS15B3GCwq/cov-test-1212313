@@ -1,9 +1,8 @@
-![Tests](https://github.com/zEdS15B3GCwq/cov-test-1212313/workflows/Tests/badge.svg)
-![Coverage](https://img.shields.io/endpoint?url=https://zEdS15B3GCwq.github.io/repo-name/badges/coverage.json)
-![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://zEdS15B3GCwq.github.io/cov-test-1212313/)
-
-
 # cov-test-1212313
+
+[![Tests](https://github.com/zEdS15B3GCwq/cov-test-1212313/workflows/Tests/badge.svg)]()
+[![Coverage](https://img.shields.io/endpoint?url=https://zEdS15B3GCwq.github.io/cov-test-1212313/badges/coverage.json)]()
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://zEdS15B3GCwq.github.io/cov-test-1212313/)
 
 Testing GitHub workflow & codecov badge generation.
 
