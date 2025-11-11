@@ -55,6 +55,12 @@ jobs:
           name: coverage-badge
           path: badges/coverage.json
 
+      - if: matrix.python-version == '3.14'
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage-html
+          path: htmlcov/
+
 
   docs:
     name: Build Documentation
@@ -86,6 +92,11 @@ jobs:
         with:
           name: coverage-badge
           path: ./docs/_build/html/badges
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: coverage-html
+          path: ./docs/_build/html/htmlcov
 
       - uses: actions/upload-pages-artifact@v4
         with:
