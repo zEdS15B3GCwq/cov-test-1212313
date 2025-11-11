@@ -17,9 +17,16 @@ jobs:
       matrix:
         python-version: ["3.12", "3.13"]
         os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - python-version: "3.14"
+            os: windows-latest
+          - python-version: "3.14"
+            os: macos-latest
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-python-env
         with:
@@ -37,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-python-env
         with:
@@ -74,6 +83,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-python-env
         with:
@@ -104,6 +115,8 @@ jobs:
     strategy: *default-strategy
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-python-env
         with:
@@ -117,6 +130,8 @@ jobs:
     strategy: *default-strategy
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-python-env
         with:
