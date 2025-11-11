@@ -21,7 +21,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: ${{ github.workspace }}/.github/actions/setup-python-env
+      - uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -38,6 +40,8 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
+      - uses: actions/checkout@v5
+
       - uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
@@ -73,6 +77,8 @@ jobs:
       id-token: write
 
     steps:
+      - uses: actions/checkout@v5
+
       - uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
@@ -103,6 +109,8 @@ jobs:
       contents: read
     strategy: *default-strategy
     steps:
+      - uses: actions/checkout@v5
+
       - uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
