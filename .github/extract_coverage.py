@@ -17,10 +17,11 @@ def get_coverage_color(pct):
 
 
 # Check if coverage.xml exists
-coverage_file = Path("../coverage.xml")
+coverage_file = Path(__file__).parent.parent / "coverage.xml"
+print(f"Looking for coverage file at: {coverage_file}")
 if not coverage_file.exists():
     print("Error: coverage.xml not found", file=sys.stderr)
-    sys.exit(1)
+    raise FileNotFoundError("coverage.xml not found")
 
 # Parse coverage.xml
 tree = ET.parse(coverage_file)
@@ -28,7 +29,8 @@ root = tree.getroot()
 coverage = float(root.attrib["line-rate"]) * 100
 
 # Create badges directory
-Path("badges").mkdir(exist_ok=True)
+badges_dir = Path(__file__).parent.parent / "badges"
+badges_dir.mkdir(exist_ok=True)
 
 # Generate badge JSON
 badge_data = {
@@ -38,7 +40,7 @@ badge_data = {
     "color": get_coverage_color(coverage),
 }
 
-with open("badges/coverage.json", "w", encoding="utf-8") as f:
+with open(badges_dir / "coverage.json", "w", encoding="utf-8") as f:
     json.dump(badge_data, f, indent=2)
 
 print(f"Coverage: {coverage:.1f}%")
