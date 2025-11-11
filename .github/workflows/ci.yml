@@ -104,15 +104,18 @@ jobs:
         python-version: ["3.14"]
         os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup-python-env
+      - name: Setup Python, UV and Nox
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
 
-      - run: nox -s type_check --force-python ${{ matrix.python-version }}
+      - name: Run type check
+        run: nox -s type_check --force-python ${{ matrix.python-version }}
 
   format:
     name: Code Formatting Check (Python ${{ matrix.python-version }} on ${{ matrix.os }})
