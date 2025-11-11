@@ -15,6 +15,7 @@ runs:
 
     - if: steps.setup-uv.outputs.cache-hit == 'true'
       run: echo "UV cache was restored"
+      shell: bash
 
     - uses: wntrblm/nox@2025.10.16
       with:
