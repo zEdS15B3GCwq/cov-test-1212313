@@ -7,6 +7,8 @@ PYTHON_VERSIONS = ["3.12", "3.13", "3.14"]
 
 # Default sessions to run when no session is specified
 nox.options.sessions = ["lint", "tests", "fmt_check"]
+nox.options.default_venv_backend = "uv|virtualenv"
+nox.options.download_python = "never"
 
 
 @nox.session(python=PYTHON_VERSIONS)
