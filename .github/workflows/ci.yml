@@ -6,12 +6,15 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  PYTHON_MAIN_VERSION: "3.14"
+
 permissions:
   contents: read
 
 jobs:
   lint:
-    name: Lint with Ruff
+    name: Lint with Ruff (Python ${{ env.PYTHON_MAIN_VERSION }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,7 +25,7 @@ jobs:
 
       - uses: wntrblm/nox@2025.10.16
         with:
-          python-versions: "3.14"
+          python-versions: ${{ env.PYTHON_MAIN_VERSION }}
 
       - run: nox -s lint
 
@@ -44,18 +47,18 @@ jobs:
         with:
           python-versions: ${{ matrix.python-version }}
 
-      - run: nox -s tests-${{ matrix.python-version }}
+      - run: nox -s tests --python ${{ matrix.python-version }}
 
-      - if: matrix.python-version == '3.14'
+      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
         run: python ${{ github.workspace }}/.github/extract_coverage.py
 
-      - if: matrix.python-version == '3.14'
+      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
         uses: actions/upload-artifact@v5
         with:
           name: coverage-badge
           path: badges/coverage.json
 
-      - if: matrix.python-version == '3.14'
+      - if: matrix.python-version == ${{ env.PYTHON_MAIN_VERSION }}
         uses: actions/upload-artifact@v5
         with:
           name: coverage-html
@@ -63,7 +66,7 @@ jobs:
 
 
   docs:
-    name: Build Documentation
+    name: Build and Deploy Documentation (Python ${{ env.PYTHON_MAIN_VERSION }})
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: test
@@ -84,9 +87,9 @@ jobs:
 
       - uses: wntrblm/nox@2025.10.16
         with:
-          python-versions: "3.14"
+          python-versions: ${{ env.PYTHON_MAIN_VERSION }}
 
-      - run: nox -s docs
+      - run: nox -s docs --python ${{ env.PYTHON_MAIN_VERSION }}
 
       - uses: actions/download-artifact@v6
         with:
