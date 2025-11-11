@@ -8,6 +8,10 @@ Testing GitHub workflow & codecov badge generation.
 
 ## Overview
 
+This is a test project to learn how to set up CI workflow with coverage report, documentation and test passing badges, and publishing results on Github Pages.
+
+The rest is AI slop.
+
 This is a simple Python package that provides basic mathematical operations. Currently, it includes an `add2()` function that adds 2 to any given number.
 
 ## Installation
