@@ -37,5 +37,10 @@ dev = [
 Homepage = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 Repository = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.4.0",
+]
+
 [tool.ruff]
 target-version = "py314"
