@@ -39,48 +39,5 @@ dev = [
 Homepage = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 Repository = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--verbose",
-    "--strict-markers",
-    "--cov=testmodule",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-]
-
 [tool.ruff]
-line-length = 88
-target-version = "py312"
-
-[tool.ruff.lint]
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "UP",  # pyupgrade
-]
-ignore = []
-
-[tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
-
-[tool.coverage.run]
-source = ["testmodule"]
-omit = ["tests/*", "*/test_*.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if __name__ == .__main__.:",
-    "raise AssertionError",
-    "raise NotImplementedError",
-]
+target-version = "py314"
