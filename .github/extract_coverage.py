@@ -3,8 +3,6 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from sphinx.search import en
-
 
 def get_coverage_color(pct):
     if pct >= 90:
@@ -19,13 +17,13 @@ def get_coverage_color(pct):
 
 
 # Check if coverage.xml exists
-coverage_file = Path("coverage.xml")
+coverage_file = Path("../coverage.xml")
 if not coverage_file.exists():
     print("Error: coverage.xml not found", file=sys.stderr)
     sys.exit(1)
 
 # Parse coverage.xml
-tree = ET.parse("coverage.xml")
+tree = ET.parse(coverage_file)
 root = tree.getroot()
 coverage = float(root.attrib["line-rate"]) * 100
 
