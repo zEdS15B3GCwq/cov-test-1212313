@@ -21,7 +21,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: ./.github/actions/setup-python-env
+      - uses: ${{ github.workspace }}/.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
 
