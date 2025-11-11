@@ -21,21 +21,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v7
-
-      - uses: actions/cache@v4
-        with: &uv-cache-config
-          path: ${{ env.UV_CACHE_DIR }}
-          key: uv-cache-${{ matrix.os }}-py${{ matrix.python-version }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
-          restore-keys: |
-            uv-cache-${{ matrix.os }}-py${{ matrix.python-version }}-
-            uv-cache-${{ matrix.os }}-
-
-      - uses: wntrblm/nox@2025.10.16
+      - uses: ./.github/actions/setup-python-env
         with:
-          python-versions: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - run: nox -s tests --force-python ${{ matrix.python-version }}
 
@@ -50,16 +38,9 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v7
-
-      - uses: actions/cache@v4
-        with: *uv-cache-config
-
-      - uses: wntrblm/nox@2025.10.16
+      - uses: ./.github/actions/setup-python-env
         with:
-          python-versions: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - run: nox -s tests_with_coverage --force-python ${{ matrix.python-version }}
 
@@ -92,16 +73,9 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v7
-
-      - uses: actions/cache@v4
-        with: *uv-cache-config
-
-      - uses: wntrblm/nox@2025.10.16
+      - uses: ./.github/actions/setup-python-env
         with:
-          python-versions: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - run: nox -s docs --force-python ${{ matrix.python-version }}
 
@@ -129,15 +103,8 @@ jobs:
       contents: read
     strategy: *default-strategy
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v7
-
-      - uses: actions/cache@v4
-        with: *uv-cache-config
-
-      - uses: wntrblm/nox@2025.10.16
+      - uses: ./.github/actions/setup-python-env
         with:
-          python-versions: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
 
       - run: nox -s lint --force-python ${{ matrix.python-version }}

@@ -1,0 +1,23 @@
+name: 'Setup Python Environment'
+description: 'Checkout code, setup uv, configure cache, and setup nox'
+
+inputs:
+  python-version:
+    description: 'Python version to use'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v5
+
+    - uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+
+    - if: steps.setup-uv.outputs.cache-hit == 'true'
+      run: echo "UV cache was restored"
+
+    - uses: wntrblm/nox@2025.10.16
+      with:
+        python-versions: ${{ inputs.python-version }}
