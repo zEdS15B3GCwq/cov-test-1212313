@@ -13,8 +13,6 @@ jobs:
   test:
     name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
     strategy:
       matrix:
         python-version: ["3.12", "3.13"]
@@ -32,8 +30,6 @@ jobs:
   test_with_coverage:
     name: Test & Coverage (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
     strategy: &default-strategy
       matrix:
         python-version: ["3.14"]
@@ -105,8 +101,6 @@ jobs:
   lint:
     name: Lint with Ruff (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
     strategy: *default-strategy
     steps:
       - uses: actions/checkout@v5
@@ -116,3 +110,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - run: nox -s lint --force-python ${{ matrix.python-version }}
+
+  type_check:
+    name: Type Check with Mypy (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy: *default-strategy
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./.github/actions/setup-python-env
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: nox -s type_check --force-python ${{ matrix.python-version }}

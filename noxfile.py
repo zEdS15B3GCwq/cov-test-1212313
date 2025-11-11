@@ -8,7 +8,13 @@ PYTHON_MAIN_VERSION = "3.14"
 PYTHON_OTHER_VERSIONS = list(set(PYTHON_ALL_VERSIONS) - set(PYTHON_MAIN_VERSION))
 
 # Default sessions to run when no session is specified
-nox.options.sessions = ["lint", "tests", "fmt_check", "tests_with_coverage"]
+nox.options.sessions = [
+    "lint",
+    "tests",
+    "fmt_check",
+    "tests_with_coverage",
+    "type_check",
+]
 nox.options.default_venv_backend = "uv|virtualenv"
 nox.options.download_python = "never"
 
@@ -80,3 +86,11 @@ def docs_clean(session):
         session.log("Cleaned documentation build directory")
     else:
         session.log("Documentation build directory does not exist")
+
+
+@nox.session(python=PYTHON_MAIN_VERSION)
+def type_check(session):
+    """Run type checking with mypy."""
+    session.install("-e", ".")
+    session.install("mypy")
+    session.run("mypy", "labnirs2snirf/")
