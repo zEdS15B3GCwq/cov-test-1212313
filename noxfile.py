@@ -93,4 +93,4 @@ def type_check(session):
     """Run type checking with mypy."""
     session.install("-e", ".")
     session.install("mypy")
-    session.run("mypy", "labnirs2snirf/")
+    session.run("mypy", "testmodule", "tests")
