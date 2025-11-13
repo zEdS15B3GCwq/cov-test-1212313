@@ -17,7 +17,8 @@ def get_coverage_color(pct):
 
 
 # Check if coverage.xml exists
-coverage_file = Path(__file__).parent.parent / "coverage.xml"
+project_root = Path(__file__).parent.parent.parent
+coverage_file = project_root / "coverage.xml"
 print(f"Looking for coverage file at: {coverage_file}")
 if not coverage_file.exists():
     print("Error: coverage.xml not found", file=sys.stderr)
@@ -29,7 +30,7 @@ root = tree.getroot()
 coverage = float(root.attrib["line-rate"]) * 100
 
 # Create badges directory
-badges_dir = Path(__file__).parent.parent / "badges"
+badges_dir = project_root / "badges"
 badges_dir.mkdir(exist_ok=True)
 
 # Generate badge JSON
