@@ -5,6 +5,7 @@
 [![coverage status](https://img.shields.io/endpoint?url=https://zEdS15B3GCwq.github.io/cov-test-1212313/badges/coverage.json)](https://zEdS15B3GCwq.github.io/cov-test-1212313/htmlcov/)
 [![docs location](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://zEdS15B3GCwq.github.io/cov-test-1212313/)
 [![python support](https://img.shields.io/badge/Python-3.12%20%7C%203.13%20%7C%203.14-blue?logo=python)](https://www.python.org/)
+[![CodeQL](https://github.com/zEdS15B3GCwq/cov-test-1212313/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/zEdS15B3GCwq/cov-test-1212313/actions/workflows/github-code-scanning/codeql)
 
 Testing GitHub workflow & codecov badge generation.
 
