@@ -112,7 +112,7 @@ jobs:
         run: nox -s type_check --force-python ${{ matrix.python-version }}
 
   format:
-    name: Code Formatting Check (python ${{ matrix.python-version }} on ${{ matrix.os }})
+    name: code formatting check (python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy: *default-strategy
     steps:
