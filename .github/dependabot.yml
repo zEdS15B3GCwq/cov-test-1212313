@@ -11,7 +11,7 @@ updates:
     schedule:
       interval: "monthly"
     cooldown:
-      default-days: 30  # zizmor does not seem to notice tha the interval is monthly already
+      default-days: 30  # zizmor does not seem to notice that the interval is monthly already
     groups:
       production-dependencies:
         dependency-type: "production"
