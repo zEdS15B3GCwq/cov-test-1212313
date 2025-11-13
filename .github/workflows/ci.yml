@@ -1,5 +1,5 @@
 ---
-name: push and PR checks
+name: CI
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -154,13 +154,24 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-3|${{ matrix.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: run pre-commit
+      - name: run pre-commit (PR)
+        if: github.event_name == 'pull_request'
         run: |
           uvx pre-commit -- run \
             --all-files \
             --show-diff-on-failure \
             --color=always \
-            --config .pre-commit-config-ci.yaml
+            --config .pre-commit-config-pr.yaml
+        shell: bash
+
+      - name: run pre-commit (push to main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          uvx pre-commit -- run \
+            --all-files \
+            --show-diff-on-failure \
+            --color=always \
+            --config .pre-commit-config-push.yaml
         shell: bash
 
   docs:
