@@ -2,11 +2,6 @@ default_language_version:
   python: python3.14
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.4.0
-    hooks:
-      - id: validate_manifest
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -91,6 +86,11 @@ repos:
     hooks:
       - id: zizmor
 
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+      - id: check-useless-excludes
+
   # Disabled for now, as it cannot work with YAML anchors and shellcheck had errors.
   # `actionlint` hook, for verifying correct syntax in GitHub Actions workflows.
   # Some additional configuration for `actionlint` can be found in `.github/actionlint.yaml`.
@@ -115,10 +115,10 @@ repos:
   - repo: local
     hooks:
     - id: nox-tests
-      name: Run tests with nox
+      name: Quick tests with nox
       entry: nox
       args: ["-t", "pre-commit"]
       language: system
       pass_filenames: false
       types: [python]
-      verbose: true
+      # verbose: true

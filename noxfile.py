@@ -26,7 +26,7 @@ nox.options.sessions = [
 nox.options.default_venv_backend = "uv|virtualenv"
 
 # Disable automatic Python downloads by nox, which is enabled by the UV backend
-nox.options.download_python = "never"
+# nox.options.download_python = "never"
 
 
 @nox.session(python=PYTHON_OTHER_VERSIONS)
@@ -101,6 +101,13 @@ def docs(session):
     session.install("-e", ".")
     session.install("sphinx", "sphinx-rtd-theme", "myst-parser")
     session.run("sphinx-build", "-b", "html", "docs", "docs/_build/html")
+
+
+@nox.session(python=PYTHON_ALL_VERSIONS, venv_backend="venv")
+def install_test(session):
+    """Test that the package can be installed cleanly in a fresh environment."""
+    session.install(".")
+    session.run("python", "-c", "import testmodule; print(testmodule.__name__)")
 
 
 @nox.session(python=PYTHON_MAIN_VERSION)
