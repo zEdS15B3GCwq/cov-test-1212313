@@ -1,6 +1,7 @@
-name: ci
+---
+name: Push and PR checks
 
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches: ["main"]
   pull_request:
@@ -24,7 +25,6 @@ jobs:
             os: windows-latest
           - python-version: "3.14"
             os: macos-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -42,12 +42,10 @@ jobs:
   test_with_coverage:
     name: Test & Coverage (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-
     strategy: &default-strategy
       matrix:
         python-version: ["3.14"]
         os: [ubuntu-latest]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -81,7 +79,6 @@ jobs:
     name: Lint with Ruff (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy: *default-strategy
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -118,7 +115,6 @@ jobs:
     name: Code Formatting Check (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy: *default-strategy
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -139,19 +135,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     strategy: *default-strategy
     needs: test_with_coverage
-
     # Allow only one deployment at a time to avoid conflicts.
     # Do not cancel in-progress deployments.
     concurrency:
       group: "pages"
       cancel-in-progress: false
-
     permissions:
       contents: read
       pages: write
       id-token: write
-
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v5
         with:

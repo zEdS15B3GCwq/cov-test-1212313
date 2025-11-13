@@ -1,5 +1,6 @@
+---
 name: 'Setup Python Environment'
-description: 'Checkout code, setup uv, configure cache, and setup nox'
+description: 'Uses uv to set up python and nox using the requested python version'
 
 inputs:
   python-version:
@@ -9,15 +10,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: astral-sh/setup-uv@v7
+    - uses: astral-sh/setup-uv@v7  # zizmor: ignore[unpinned-uses]
       with:
         enable-cache: true
-        prune-cache: false
+        prune-cache: false  # pruning is recommended, which is faster?
 
     - if: steps.setup-uv.outputs.cache-hit == 'true'
       run: echo "UV cache was restored"
       shell: bash
 
-    - uses: wntrblm/nox@2025.10.16
+    - uses: wntrblm/nox@2025.10.16  # zizmor: ignore[unpinned-uses]
       with:
         python-versions: ${{ inputs.python-version }}

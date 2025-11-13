@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Welcome to the documentation for **cov-test-1212313**, a simple Python package demonstrating best practices for Python package development, testing, and documentation.
+Welcome to the documentation for **cov-test-1212313**, a simple Python package
+demonstrating best practices for Python package development, testing, and
+documentation.
 
 ## Features
 
@@ -49,7 +51,8 @@ pytest --cov=testmodule
 
 ## Development
 
-For information on contributing and development setup, see the main README.md file.
+For information on contributing and development setup, see the main README.md
+file.
 
 ## Contents
 
