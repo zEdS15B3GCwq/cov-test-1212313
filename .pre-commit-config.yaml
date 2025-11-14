@@ -13,7 +13,7 @@ repos:
       - id: check-useless-excludes
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -34,17 +34,17 @@ repos:
         args: [--pytest-test-first]
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: a30f0d816e5062a67d87c8de753cfe499672b959  # frozen: v1.5.5
     hooks:
       - id: forbid-tabs
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.24.1
+    rev: 78f5e0f104cfa803d0597eaa924b4de3becd3e3e  # frozen: v0.24.1
     hooks:
       - id: validate-pyproject
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.4
+    rev: 488940d9de1b658fac229e34c521d75a6ea476f2  # frozen: v0.14.5
     hooks:
       # Linter
       - id: ruff-check
@@ -60,60 +60,60 @@ repos:
   #       args: [--py312-plus]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: 9f70dc58c23dfcca1b97af99eaeee3140a807c7e  # frozen: v1.18.2
     hooks:
       - id: mypy
         additional_dependencies:
           - polars==1.35.2
 
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: v4.0.0
+    rev: 832dc73b1c9cea082ffcfeae01ae89dfc1ac5043  # frozen: v4.0.0
     hooks:
       - id: add-trailing-comma
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.1
+    rev: 46c3d526905780be88d227f46e19f24f2593fbbe  # frozen: v3.21.1
     hooks:
       - id: pyupgrade
         args: [--py314-plus]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
+    rev: 192ad822316c3a22fb3d3cc8aa6eafa0b8488360  # frozen: v0.45.0
     hooks:
       - id: markdownlint
 
   - repo: https://github.com/adamchainz/blacken-docs
-    rev: '1.20.0'
+    rev: 'dda8db18cfc68df532abf33b185ecd12d5b7b326'  # frozen: 1.20.0
     hooks:
       - id: blacken-docs
         additional_dependencies:
           - black==25.11.0
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.39.0
+    rev: 4904c9375ec644088cb56ea862a6ecff46e74d16  # frozen: v1
     hooks:
       - id: typos
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: 63c8f8312b7559622c0d82815639671ae42132ac  # frozen: v2.4.1
     hooks:
       - id: codespell
 
   # zizmor detects security vulnerabilities in GitHub Actions workflows.
   # Additional configuration for the tool is found in `.github/zizmor.yml`
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.16.3
+    rev: 86ee5ea442ee969842e00913c6b76c060a7aa8ef  # frozen: v1.16.3
     hooks:
       - id: zizmor
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.1
+    rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7  # frozen: v1.37.1
     hooks:
       - id: yamllint
         args: [-c=.yamllint]
 
   - repo: https://github.com/google/yamlfmt
-    rev: v0.20.0
+    rev: 884e367e8fae92b238653fd950a54d235d418e4e  # frozen: v0.20.0
     hooks:
       - id: yamlfmt
 
