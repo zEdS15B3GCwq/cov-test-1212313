@@ -6,7 +6,14 @@ on:  # yamllint disable-line rule:truthy
     branches: ["main"]
   pull_request:
     branches: ["main"]
+  merge_group:
+    branches: ["main"]
   workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+# Cancel tests if a new commit is pushed to the same PR or merge group
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -18,13 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13", "3.13t", "3.14t"]
+        python-version: ["3.12", "3.13", "3.14", "3.13t", "3.14t"]
         os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - python-version: "3.14"
-            os: windows-latest
-          - python-version: "3.14"
-            os: macos-latest
     steps:
       - name: checkout code
         uses: actions/checkout@v5
@@ -39,46 +41,13 @@ jobs:
       - name: run tests
         run: nox -s tests --force-python ${{ matrix.python-version }}
 
-  test_with_coverage:
-    name: tests & coverage (python ${{ matrix.python-version }} on ${{ matrix.os }})
+  lint:
+    name: lint with Ruff (python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy: &default-strategy
       matrix:
         python-version: ["3.14"]
         os: [ubuntu-latest]
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v5
-        with:
-          persist-credentials: false
-
-      - name: setup python, uv and nox
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: run tests with coverage
-        run: nox -s tests_with_coverage --force-python ${{ matrix.python-version }}
-
-      - name: extract coverage badge data
-        run: python ${{ github.workspace }}/.github/scripts/extract_coverage.py
-
-      - name: upload coverage badge
-        uses: actions/upload-artifact@v5
-        with:
-          name: coverage-badge
-          path: badges/coverage.json
-
-      - name: upload coverage HTML report
-        uses: actions/upload-artifact@v5
-        with:
-          name: coverage-html
-          path: htmlcov/
-
-  lint:
-    name: lint with Ruff (python ${{ matrix.python-version }} on ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy: *default-strategy
     steps:
       - name: checkout code
         uses: actions/checkout@v5
@@ -175,54 +144,3 @@ jobs:
         shell: bash
         env:
           SKIP: ruff-check,ruff-format,mypy,nox-tests,no-commit-to-branch
-
-  docs:
-    name: build & deploy docs
-    runs-on: ${{ matrix.os }}
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    strategy: *default-strategy
-    needs: test_with_coverage
-    # Allow only one deployment at a time to avoid conflicts.
-    # Do not cancel in-progress deployments.
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    steps:
-
-      - name: checkout code
-        uses: actions/checkout@v5
-        with:
-          persist-credentials: false
-
-      - name: setup python, uv and nox
-        uses: ./.github/actions/setup-python-env
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: build documentation
-        run: nox -s docs --force-python ${{ matrix.python-version }}
-
-      - name: download coverage badge artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: coverage-badge
-          path: ./docs/_build/html/badges
-
-      - name: download coverage HTML report artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: coverage-html
-          path: ./docs/_build/html/htmlcov
-
-      - name: make combined artifact available to GitHub Pages
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: ./docs/_build/html
-
-      - name: deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
