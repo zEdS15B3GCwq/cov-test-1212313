@@ -14,10 +14,12 @@ permissions:
   contents: read
 
 jobs:
-  check-fork:
+  prepare:
     runs-on: ubuntu-latest
     outputs:
       is_fork: ${{ steps.check-fork.outputs.is_fork }}
+      has_files: ${{ steps.changed.outputs.has_files }}
+      changed_files: ${{ steps.changed.outputs.files }}
 
     steps:
       - name: check if PR is from a fork
@@ -28,13 +30,37 @@ jobs:
             const pr = context.payload.pull_request;
             const isFork = pr.head.repo.full_name !== pr.base.repo.full_name;
             core.setOutput("is_fork", isFork.toString());
+            console.log(`Is fork: ${isFork}`);
+
+      - name: list changed files in PR
+        id: changed
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+              }
+            );
+            const filenames = files
+              .filter(f => f.status !== 'removed')  // Filter removed files
+              .map(f => f.filename);
+            console.log("Changed files:", filenames);
+
+            const filesString = filenames.join('\n');
+            core.setOutput("files", filesString);
+            core.setOutput("has_files", filenames.length > 0 ? "true" : "false");
 
   precommit:
     name: |
       pre-commit checks on changed files (python ${{ matrix.python-version }} on ${{ matrix.os }})
-    needs: check-fork
+    needs: prepare
     runs-on: ubuntu-latest
-    if: needs.check-fork.outputs.is_fork == 'false'
+    if: needs.prepare.outputs.is_fork == 'false' && needs.prepare.outputs.has_files == 'true'
     permissions:
       contents: write
       pull-requests: write
@@ -64,66 +90,30 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: ${{ github.workflow }}-${{ matrix.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
-      - name: get changed files in PR
-        id: changed
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            const files = await github.paginate(
-              github.rest.pulls.listFiles,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-              }
-            );
-            const filenames = files
-              .filter(f => f.status !== 'removed')  // Filter removed files
-              .map(f => f.filename);
-            console.log("Changed files:", filenames);
-
-            // Write filenames to a temporary file, one per line
-            const fs = require('fs');
-            if (filenames.length > 0) {
-              fs.writeFileSync('changed_files.txt', filenames.join('\n'));
-            }
-
-            core.setOutput("has_files", filenames.length > 0 ? "true" : "false");
-            core.setOutput("count", filenames.length.toString());
 
       - name: run pre-commit on changed files
-        if: steps.changed.outputs.has_files == 'true'
         id: run-precommit
         continue-on-error: true
         env:
           SKIP: nox-tests
+          CHANGED_FILES: ${{ needs.prepare.outputs.changed_files }}
         run: |
           # Validate file exists and is not empty
-          if [ ! -s changed_files.txt ]; then
-            echo "Error: changed_files.txt is empty or missing"
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "Error: no changed files"
             exit 1
           fi
 
-          # Read files from the temporary file (one per line)
           # xargs properly handles special characters and spaces
-          xargs -a changed_files.txt -d '\n' \
+          echo "$CHANGED_FILES" | xargs -d '\n' \
             uvx pre-commit run \
               --show-diff-on-failure \
               --color=always \
               --files
-
-          rm changed_files.txt
-        shell: bash
-
-      - name: report pre-commit failure
-        if: steps.run-precommit.outcome == 'failure'
-        run: |
-          echo "Pre-commit checks failed. Please fix the issues and push again."
         shell: bash
 
       - name: check for files modified by pre-commit
-        if: steps.changed.outputs.has_files == 'true' && steps.run-precommit.outcome == 'failure'
+        if: steps.run-precommit.outcome == 'failure'
         id: modified
         run: |
           git_status=$(git status --porcelain)
