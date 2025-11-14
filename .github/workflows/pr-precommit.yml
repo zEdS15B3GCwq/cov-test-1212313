@@ -107,22 +107,28 @@ jobs:
 
           # Read files from the temporary file (one per line)
           # xargs properly handles special characters and spaces
-          xargs -a changed_files.txt -d '\n' uvx pre-commit run --files \
-            --show-diff-on-failure \
-            --color=always
+          xargs -a changed_files.txt -d '\n' \
+            uvx pre-commit run \
+              --show-diff-on-failure \
+              --color=always \
+              --files
         shell: bash
 
       - name: report pre-commit failure
-        if: steps.precommit.outcome == 'failure'
+        if: steps.run-precommit.outcome == 'failure'
         run: |
           echo "::error::Pre-commit checks failed. Please fix the issues and push again."
         shell: bash
 
       - name: check for files modified by pre-commit
-        if: steps.changed.outputs.has_files == 'true'
+        if: steps.changed.outputs.has_files == 'true' && steps.run-precommit.outcome == 'success'
         id: modified
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
+          git_status=$(git status --porcelain)
+          echo "Git status output:"
+          echo "$git_status"
+
+          if [ -n "$git_status" ]; then
             echo "changes=true" >> $GITHUB_OUTPUT
           else
             echo "changes=false" >> $GITHUB_OUTPUT
