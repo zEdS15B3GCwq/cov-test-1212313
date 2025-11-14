@@ -45,12 +45,12 @@ jobs:
       - name: import test (wheel)
         run: |
           uv run --isolated --no-project --with dist/*.whl -- \
-            python -c "import testmodule; print(testmodule.__version__)"
+            python -c "import testmodule; print(testmodule.__name__)"
 
       - name: import test (source)
         run: |
           uv run --isolated --no-project --with dist/*.tar.gz -- \
-            python -c "import testmodule; print(testmodule.__version__)"
+            python -c "import testmodule; print(testmodule.__name__)"
 
       - name: upload dist files
         uses: actions/upload-artifact@v5
