@@ -10,15 +10,14 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: astral-sh/setup-uv@v7  # zizmor: ignore[unpinned-uses]
+    - uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3  # v7.1.3
       with:
         enable-cache: true
-        prune-cache: false  # pruning is recommended, which is faster?
 
     - if: steps.setup-uv.outputs.cache-hit == 'true'
       run: echo "UV cache was restored"
       shell: bash
 
-    - uses: wntrblm/nox@2025.10.16  # zizmor: ignore[unpinned-uses]
+    - uses: wntrblm/nox@0eee2e45758dbd06d48ebb23476439f0f00e5cbd  # 2025.11.12
       with:
         python-versions: ${{ inputs.python-version }}

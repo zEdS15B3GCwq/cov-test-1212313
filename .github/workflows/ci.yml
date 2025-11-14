@@ -139,7 +139,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: setup latest version of uv
+      - name: install latest version of uv
         uses: astral-sh/setup-uv@v7  # zizmor: ignore[unpinned-uses]
         with:
           enable-cache: true
@@ -160,9 +160,10 @@ jobs:
           uvx pre-commit -- run \
             --all-files \
             --show-diff-on-failure \
-            --color=always \
-            --config .pre-commit-config-pr.yaml
+            --color=always
         shell: bash
+        env:
+          SKIP: ruff-check,ruff-format,mypy,nox-tests
 
       - name: run pre-commit (push to main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -170,9 +171,10 @@ jobs:
           uvx pre-commit -- run \
             --all-files \
             --show-diff-on-failure \
-            --color=always \
-            --config .pre-commit-config-push.yaml
+            --color=always
         shell: bash
+        env:
+          SKIP: ruff-check,ruff-format,mypy,nox-tests,no-commit-to-branch
 
   docs:
     name: build & deploy docs
