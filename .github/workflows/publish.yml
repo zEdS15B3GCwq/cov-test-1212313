@@ -62,7 +62,6 @@ jobs:
   upload-github:
     name: upload dist files (GitHub)
     runs-on: ubuntu-latest
-    if: false
     permissions:
       contents: write
     needs: build
