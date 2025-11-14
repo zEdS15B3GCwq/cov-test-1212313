@@ -112,12 +112,14 @@ jobs:
               --show-diff-on-failure \
               --color=always \
               --files
+
+          del changed_files.txt
         shell: bash
 
       - name: report pre-commit failure
         if: steps.run-precommit.outcome == 'failure'
         run: |
-          echo "::error::Pre-commit checks failed. Please fix the issues and push again."
+          echo "Pre-commit checks failed. Please fix the issues and push again."
         shell: bash
 
       - name: check for files modified by pre-commit
@@ -130,8 +132,10 @@ jobs:
 
           if [ -n "$git_status" ]; then
             echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Modified files detected by pre-commit"
           else
             echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No modifications made by pre-commit"
           fi
         shell: bash
 
