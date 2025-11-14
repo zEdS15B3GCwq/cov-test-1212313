@@ -7,6 +7,7 @@ name: publish
 on:  # yamllint disable-line rule:truthy
   release:
     types: [published]
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
 #   push:
 #     tags:
 #       # Publish on any tag starting with a `v`, e.g., v0.1.0
