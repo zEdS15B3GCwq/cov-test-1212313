@@ -1,0 +1,128 @@
+---
+name: pre-commit PR check
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    # types: [opened, synchronize]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check-fork:
+    runs-on: ubuntu-latest
+    outputs:
+      is_fork: ${{ steps.check-fork.outputs.is_fork }}
+
+    steps:
+      - name: check if PR is from a fork
+        id: check-fork
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const isFork = pr.head.repo.full_name !== pr.base.repo.full_name;
+            core.setOutput("is_fork", isFork.toString());
+
+  precommit:
+    name: |
+      pre-commit checks on changed files (python ${{ matrix.python-version }} on ${{ matrix.os }})
+    needs: check-fork
+    runs-on: ubuntu-latest
+    if: needs.check-fork.outputs.is_fork == 'false'
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+        os: [ubuntu-latest]
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # Required for full git history
+
+      - name: install uv
+        uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3  # v7.1.3
+        with:
+          enable-cache: true
+
+      - name: install pre-commit
+        run: uv tool install pre-commit --with pre-commit-uv --python ${{ matrix.python-version }}
+        shell: bash
+
+      - name: cache pre-commit cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ github.workflow }}-${{ matrix.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+      - name: get changed files in PR
+        id: changed
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+              }
+            );
+            const filenames = files
+              .filter(f => f.status !== 'removed')  // Filter removed files
+              .map(f => f.filename);
+            console.log("Changed files:", filenames);
+
+            // Write filenames to a temporary file, one per line
+            const fs = require('fs');
+            if (filenames.length > 0) {
+              fs.writeFileSync('changed_files.txt', filenames.join('\n'));
+            }
+
+            core.setOutput("has_files", filenames.length > 0 ? "true" : "false");
+            core.setOutput("count", filenames.length.toString());
+
+      - name: run pre-commit on changed files
+        if: steps.changed.outputs.has_files == 'true'
+        run: |
+          # Read files from the temporary file (one per line)
+          # xargs properly handles special characters and spaces
+          xargs -a changed_files.txt -d '\n' uvx pre-commit run --files \
+            --show-diff-on-failure \
+            --color=always
+        shell: bash
+        env:
+          SKIP: nox-tests
+
+      - name: check for files modified by pre-commit
+        id: modified
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Commit and push fixes
+        if: steps.modified.outputs.changes == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            console.log("Pre-commit made changes, committing and pushing...");
+        # run: |
+        #   git config user.name "github-actions[bot]"
+        #   git config user.email "github-actions[bot]@users.noreply.github.com"
+        #   git add .
+        #   git commit -m "[pre-commit] fixes"
+        #   git push
