@@ -94,17 +94,32 @@ jobs:
 
       - name: run pre-commit on changed files
         if: steps.changed.outputs.has_files == 'true'
+        id: run-precommit
+        continue-on-error: true
+        env:
+          SKIP: nox-tests
         run: |
+          # Validate file exists and is not empty
+          if [ ! -s changed_files.txt ]; then
+            echo "Error: changed_files.txt is empty or missing"
+            exit 1
+          fi
+
           # Read files from the temporary file (one per line)
           # xargs properly handles special characters and spaces
           xargs -a changed_files.txt -d '\n' uvx pre-commit run --files \
             --show-diff-on-failure \
             --color=always
         shell: bash
-        env:
-          SKIP: nox-tests
+
+      - name: report pre-commit failure
+        if: steps.precommit.outcome == 'failure'
+        run: |
+          echo "::error::Pre-commit checks failed. Please fix the issues and push again."
+        shell: bash
 
       - name: check for files modified by pre-commit
+        if: steps.changed.outputs.has_files == 'true'
         id: modified
         run: |
           if [ -n "$(git status --porcelain)" ]; then
@@ -114,12 +129,11 @@ jobs:
           fi
         shell: bash
 
-      - name: Commit and push fixes
+      - name: commit and push fixes
         if: steps.modified.outputs.changes == 'true'
-        uses: actions/github-script@v8
-        with:
-          script: |
-            console.log("Pre-commit made changes, committing and pushing...");
+        run: |
+          echo "Pre-commit made changes, committing and pushing..."
+        shell: bash
         # run: |
         #   git config user.name "github-actions[bot]"
         #   git config user.email "github-actions[bot]@users.noreply.github.com"
