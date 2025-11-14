@@ -113,7 +113,7 @@ jobs:
               --color=always \
               --files
 
-          del changed_files.txt
+          rm changed_files.txt
         shell: bash
 
       - name: report pre-commit failure
