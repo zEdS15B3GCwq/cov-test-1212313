@@ -4,8 +4,11 @@ name: CI
 on:  # yamllint disable-line rule:truthy
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["pre-commit PR check"]
+    types: [completed]
+  # pull_request:
+  #   branches: ["main"]
   # merge_group:
   #   branches: ["main"]
   workflow_dispatch:  # Allows manual trigger from GitHub UI
