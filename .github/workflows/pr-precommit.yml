@@ -34,9 +34,7 @@ jobs:
             const commits = await github.rest.pulls.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: pr.number,
-              per_page: 1,
-              page: 1
+              pull_number: pr.number
             });
 
             const latestCommit = commits.data[commits.data.length - 1];
@@ -49,7 +47,10 @@ jobs:
               (committer?.login || '').includes('[bot]') ||
               (author?.login || '').includes('[bot]');
             core.setOutput("is_bot", isBot.toString());
-            console.log(`Committer: ${committer?.login} (${committer?.type}), Author: ${author?.login} (${author?.type}), is bot: ${isBot}`);
+            console.log(`Latest commit SHA: ${latestCommit.sha}`);
+            console.log(`Committer: ${committer?.login} (type: ${committer?.type})`);
+            console.log(`Author: ${author?.login} (type: ${author?.type})`);
+            console.log(`Is bot: ${isBot}`);
 
       - name: check if PR is from a fork
         id: check-fork
