@@ -76,9 +76,9 @@ jobs:
       needs.prepare.outputs.is_fork == 'false' &&
       needs.prepare.outputs.has_files == 'true' &&
       needs.prepare.outputs.is_bot == 'false'
-    permissions:
-      contents: write
-      pull-requests: write
+    outputs:
+      changes_detected: ${{ steps.modified.outputs.changes }}
+      artifact_name: ${{ steps.artifact-name.outputs.name }}
     strategy:
       matrix:
         python-version: ["3.14"]
@@ -122,12 +122,12 @@ jobs:
             exit 1
           fi
 
-          # xargs properly handles special characters and spaces
-          echo "$CHANGED_FILES" | xargs -d '\n' \
-            uvx pre-commit run \
-              --show-diff-on-failure \
-              --color=always \
-              --files
+          mapfile -t files_array <<< "$CHANGED_FILES"
+
+          uvx pre-commit run \
+            --show-diff-on-failure \
+            --color=always \
+            --files "${files_array[@]}"
         shell: bash
 
       - name: check for files modified by pre-commit
@@ -147,8 +147,50 @@ jobs:
           fi
         shell: bash
 
-      - name: commit and push fixes
+      - name: generate artifact name
         if: steps.modified.outputs.changes == 'true'
+        id: artifact-name
+        run: |
+          artifact_name="precommit-fixes-${{ github.run_id }}-${{ github.run_attempt }}"
+          echo "name=${artifact_name}" >> $GITHUB_OUTPUT
+          echo "Generated artifact name: ${artifact_name}"
+        shell: bash
+
+      - name: upload modified files as artifact
+        if: steps.modified.outputs.changes == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ steps.artifact-name.outputs.name }}
+          path: |
+            .
+            !.git
+          retention-days: 1
+
+  push:
+    name: push pre-commit fixes
+    needs: precommit
+    runs-on: ubuntu-latest
+    if: needs.precommit.outputs.changes_detected == 'true'
+    permissions:
+      contents: write
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: download artifact with fixes
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.precommit.outputs.artifact_name }}
+          path: .
+
+      - name: commit and push fixes
         shell: bash
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -157,8 +199,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
-
+          # gh auth setup-git
           git add .
           git commit -m "[pre-commit] automatic fixes"
           git push origin "HEAD:refs/heads/${HEAD_REF}"
