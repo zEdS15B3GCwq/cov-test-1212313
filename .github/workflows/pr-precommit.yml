@@ -171,17 +171,26 @@ jobs:
     needs: precommit
     runs-on: ubuntu-latest
     if: needs.precommit.outputs.changes_detected == 'true'
+    environment:
+      name: pre-commit-bot
     permissions:
       contents: write
 
     steps:
+      - name: generate github app token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: checkout code
         uses: actions/checkout@v5
         with:
           persist-credentials: true
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           fetch-depth: 0
 
       - name: download artifact with fixes
