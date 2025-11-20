@@ -5,7 +5,7 @@ import nox
 # Python versions to test against
 PYTHON_ALL_VERSIONS = ["3.12", "3.13", "3.14"]
 PYTHON_MAIN_VERSION = "3.14"
-PYTHON_OTHER_VERSIONS = list(set(PYTHON_ALL_VERSIONS) - {PYTHON_MAIN_VERSION})
+PYTHON_ALLBUTMAIN_VERSIONS = list(set(PYTHON_ALL_VERSIONS) - {PYTHON_MAIN_VERSION})
 
 # Alternative way to get Python versions from pyproject.toml
 # Load project metadata from pyproject.toml
@@ -29,7 +29,7 @@ nox.options.default_venv_backend = "uv|virtualenv"
 # nox.options.download_python = "never"
 
 
-@nox.session(python=PYTHON_OTHER_VERSIONS)
+@nox.session(python=PYTHON_ALLBUTMAIN_VERSIONS)
 def tests(session):
     """Run the test suite with pytest."""
     session.install("-e", ".")
@@ -113,8 +113,8 @@ def install_test(session):
 @nox.session(python=PYTHON_MAIN_VERSION)
 def docs_clean(session):
     """Clean the documentation build directory."""
-    import shutil
-    from pathlib import Path
+    import shutil  # pylint: disable=import-outside-toplevel
+    from pathlib import Path  # pylint: disable=import-outside-toplevel
 
     build_dir = Path("docs/_build")
     if build_dir.exists():
