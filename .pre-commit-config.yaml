@@ -135,10 +135,17 @@ repos:
       - id: yamlfmt
 
   - repo: https://github.com/numpy/numpydoc
-    rev: 3db2f68e5a6af0de867f9ec1ea94c6052d1d824f # frozen: v1.9.0
+    rev: 3db2f68e5a6af0de867f9ec1ea94c6052d1d824f  # frozen: v1.9.0
     hooks:
       - id: numpydoc-validation
         exclude: noxfile.py
+
+  # Find dead Python code
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: e454d2ef39fc23e72549ff23a1a14e31c3a75605  # frozen: v2.14
+    hooks:
+      - id: vulture
+        args: ["testmodule/", "tests/"]
 
   # Disabled: using ruff
   # - repo: https://github.com/pycqa/flake8

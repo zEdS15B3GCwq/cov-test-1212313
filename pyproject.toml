@@ -32,6 +32,14 @@ dependencies = []
 Homepage = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 Repository = "https://github.com/zEdS15B3GCwq/cov-test-1212313"
 
+[dependency-groups]
+dev = [
+    "nox>=2025.11.12",
+    "pre-commit>=4.4.0",
+    "pre-commit-uv>=4.2.0",
+    "sphinx>=8.2.3",
+]
+
 [tool.ruff]
 target-version = "py314"
 
@@ -46,3 +54,6 @@ checks = [
 exclude_files = [ # don't process filepaths that match these regex
     "^./noxfile.py",
 ]
+
+[tool.uv]
+default-groups = []
