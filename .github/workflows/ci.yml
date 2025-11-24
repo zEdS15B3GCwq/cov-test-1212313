@@ -164,8 +164,8 @@ jobs:
         #   --with pre-commit-uv \
         #   --python ${{ matrix.python-version }} -- \
         run: |
-          uvx prek --python ${{ matrix.python-version }} -- \
-            run \
+          uvx --python ${{ matrix.python-version }} \
+            prek run \
             --all-files \
             --show-diff-on-failure \
             --color=always
@@ -176,7 +176,8 @@ jobs:
       - name: run pre-commit (push to main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          uvx prek --python ${{ matrix.python-version }} run \
+          uvx --python ${{ matrix.python-version }} \
+            prek run \
             --all-files \
             --show-diff-on-failure \
             --color=always

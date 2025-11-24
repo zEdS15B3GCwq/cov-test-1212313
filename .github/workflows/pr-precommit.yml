@@ -145,8 +145,8 @@ jobs:
           mapfile -t files_array <<< "$CHANGED_FILES"
 
           echo "pre_commit_ran=true" >> $GITHUB_OUTPUT
-          uvx prek --python ${{ matrix.python-version }} -- \
-            run \
+          uvx --python ${{ matrix.python-version }} \
+            prek run \
             --show-diff-on-failure \
             --color=always \
             --files "${files_array[@]}"
