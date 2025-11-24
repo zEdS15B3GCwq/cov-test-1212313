@@ -124,9 +124,9 @@ jobs:
         with:
           # path: ~/.cache/pre-commit
           path: ~/.cache/prek
-          key: prek | ${{ matrix.os }} | ${{ matrix.python-version }} | ${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+          key: prek-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
           restore-keys: |
-            prek | ${{ matrix.os }} | ${{ matrix.python-version }}
+            prek-${{ matrix.os }}-${{ matrix.python-version }}
 
       - name: run pre-commit on changed files
         id: run-precommit
