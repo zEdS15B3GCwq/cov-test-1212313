@@ -16,10 +16,12 @@ PYTHON_ALLBUTMAIN_VERSIONS = list(set(PYTHON_ALL_VERSIONS) - {PYTHON_MAIN_VERSIO
 # Default sessions to run when no session is explicitly specified
 nox.options.sessions = [
     "tests_with_coverage",
-    "lint",
+    # "lint",
     "type_check",
-    "fmt_check",
+    # "fmt_check",
     "install_test",
+    "docs",
+    # "pre-commit",
 ]
 
 # Use UV virtual environment backend by default
@@ -66,11 +68,11 @@ def tests_with_coverage(session):
     )
 
 
-@nox.session(python=PYTHON_MAIN_VERSION)
-def lint(session):
-    """Run linting checks with ruff."""
-    session.install("ruff")
-    session.run("ruff", "check", ".")
+# @nox.session(python=PYTHON_MAIN_VERSION)
+# def lint(session):
+#     """Run linting checks with ruff."""
+#     session.install("ruff")
+#     session.run("ruff", "check", ".")
 
 
 @nox.session(python=PYTHON_MAIN_VERSION)
@@ -81,18 +83,25 @@ def type_check(session):
     session.run("mypy", "testmodule", "tests")
 
 
-@nox.session(python=PYTHON_MAIN_VERSION)
-def fmt_check(session):
-    """Check code formatting with ruff."""
-    session.install("ruff")
-    session.run("ruff", "format", "--check", "--diff", ".")
+# @nox.session(python=PYTHON_MAIN_VERSION)
+# def fmt_check(session):
+#     """Check code formatting with ruff."""
+#     session.install("ruff")
+#     session.run("ruff", "format", "--check", "--diff", ".")
 
 
-@nox.session(python=PYTHON_MAIN_VERSION)
-def fmt(session):
-    """Auto-format code with ruff."""
-    session.install("ruff")
-    session.run("ruff", "format", ".")
+# @nox.session(python=PYTHON_MAIN_VERSION)
+# def fmt(session):
+#     """Auto-format code with ruff."""
+#     session.install("ruff")
+#     session.run("ruff", "format", ".")
+
+
+@nox.session(python=PYTHON_ALL_VERSIONS, venv_backend="venv")
+def install_test(session):
+    """Test that the package can be installed cleanly in a fresh environment."""
+    session.install(".")
+    session.run("python", "-c", "import testmodule; print(testmodule.__name__)")
 
 
 @nox.session(python=PYTHON_MAIN_VERSION)
@@ -101,13 +110,6 @@ def docs(session):
     session.install("-e", ".")
     session.install("sphinx", "sphinx-rtd-theme", "myst-parser")
     session.run("sphinx-build", "-b", "html", "docs", "docs/_build/html")
-
-
-@nox.session(python=PYTHON_ALL_VERSIONS, venv_backend="venv")
-def install_test(session):
-    """Test that the package can be installed cleanly in a fresh environment."""
-    session.install(".")
-    session.run("python", "-c", "import testmodule; print(testmodule.__name__)")
 
 
 @nox.session(python=PYTHON_MAIN_VERSION)
@@ -122,3 +124,10 @@ def docs_clean(session):
         session.log("Cleaned documentation build directory")
     else:
         session.log("Documentation build directory does not exist")
+
+
+@nox.session(python=PYTHON_MAIN_VERSION)
+def pre_commit(session):
+    """Run pre-commit checks."""
+    session.install("pre-commit")
+    session.run("pre-commit", "run", "--all-files")

@@ -35,21 +35,31 @@ jobs:
         with:
           enable-cache: true
 
-      - name: install Python
-        run: uv python install ${{ matrix.python-version }}
+      # - name: install Python
+      #   run: uv python install ${{ matrix.python-version }}
 
       - name: build with uv
-        run: uv build
+        run: uv build --python ${{ matrix.python-version }}
 
       # Check that basic features work and we didn't miss to include crucial files
       - name: import test (wheel)
         run: |
-          uv run --isolated --no-project --with dist/*.whl -- \
+          uv run \
+            --isolated \
+            --no-project \
+            --python ${{ matrix.python-version }} \
+            --with dist/*.whl \
+            -- \
             python -c "import testmodule; print(testmodule.__name__)"
 
       - name: import test (source)
         run: |
-          uv run --isolated --no-project --with dist/*.tar.gz -- \
+          uv run \
+            --isolated \
+            --no-project \
+            --python ${{ matrix.python-version }} \
+            --with dist/*.tar.gz \
+            -- \
             python -c "import testmodule; print(testmodule.__name__)"
 
       - name: upload dist files
