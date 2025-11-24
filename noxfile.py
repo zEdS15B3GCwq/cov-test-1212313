@@ -20,7 +20,8 @@ nox.options.sessions = [
     "type_check",
     # "fmt_check",
     "install_test",
-    "pre-commit",
+    "docs",
+    # "pre-commit",
 ]
 
 # Use UV virtual environment backend by default

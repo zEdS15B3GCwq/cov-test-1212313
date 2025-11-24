@@ -40,8 +40,8 @@ jobs:
       # - name: install python and nox
       #   uses: wntrblm/nox@0eee2e45758dbd06d48ebb23476439f0f00e5cbd  # 2025.11.12
 
-      - name: install nox
-        run: uv tool install nox
+      # - name: install nox
+      #   run: uv tool install nox
 
       - name: run tests with coverage
         run: uvx nox -s tests_with_coverage --force-python ${{ matrix.python-version }}
@@ -64,7 +64,7 @@ jobs:
           if-no-files-found: error
 
       - name: build documentation
-        run: nox -s docs --force-python ${{ matrix.python-version }}
+        run: uvx nox -s docs --force-python ${{ matrix.python-version }}
 
       - name: upload documnentation HTML
         uses: actions/upload-artifact@v5

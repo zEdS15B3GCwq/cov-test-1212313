@@ -84,7 +84,7 @@ jobs:
   #       shell: bash
 
   type_check:
-    name: type check with mypy (python ${{ matrix.python-version }} on ${{ matrix.os }})
+    name: type check with mypy
     runs-on: ${{ matrix.os }}
     strategy: &default-strategy
       matrix:
@@ -101,13 +101,13 @@ jobs:
         with:
           enable-cache: true
 
-      - name: install nox
-        run: uv tool install nox
+      - name: run mypy
+        run: uvx --python ${{ matrix.python-version }} mypy testmodule tests
         shell: bash
 
-      - name: Run type check
-        run: uvx nox -s type_check --force-python ${{ matrix.python-version }}
-        shell: bash
+  #     - name: Run type check
+  #       run: uvx nox -s type_check --force-python ${{ matrix.python-version }}
+  #       shell: bash
 
   # Ruff formatting is in pre-commit
   # format:
@@ -134,7 +134,7 @@ jobs:
   #       shell: bash
 
   precommit:
-    name: pre-commit checks (python ${{ matrix.python-version }} on ${{ matrix.os }})
+    name: pre-commit checks on all files
     runs-on: ${{ matrix.os }}
     strategy: *default-strategy
     steps:
@@ -148,20 +148,23 @@ jobs:
         with:
           enable-cache: true
 
-      # - name: install pre-commit
-      #   run: uv tool install pre-commit --with pre-commit-uv --python ${{ matrix.python-version }}
-      #   shell: bash
-
-      - name: cache pre-commit cache
+      - name: save prek cache
+        # - name: save pre-commit cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pre-commit
-          key: precommit | ${{ matrix.python-version }} | ${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+          # path: ~/.cache/pre-commit
+          path: ~/.cache/prek
+          key: prek | ${{ matrix.os }} | ${{ matrix.python-version }} | ${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+          restore-keys: |
+            prek | ${{ matrix.os }} | ${{ matrix.python-version }}
 
       - name: run pre-commit (PR)
         if: github.event_name == 'pull_request'
+        # uvx pre-commit \
+        #   --with pre-commit-uv \
+        #   --python ${{ matrix.python-version }} -- \
         run: |
-          uvx pre-commit --with pre-commit-uv --python ${{ matrix.python-version }} -- \
+          uvx prek --python ${{ matrix.python-version }} -- \
             run \
             --all-files \
             --show-diff-on-failure \
@@ -173,10 +176,11 @@ jobs:
       - name: run pre-commit (push to main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          uvx pre-commit -- run \
+          uvx prek --python ${{ matrix.python-version }} run \
             --all-files \
             --show-diff-on-failure \
             --color=always
         shell: bash
         env:
-          SKIP: ruff-check,ruff-format,mypy,nox-tests,no-commit-to-branch
+          # SKIP: ruff-check,ruff-format,mypy,nox-tests,no-commit-to-branch
+          SKIP: mypy,nox-tests,no-commit-to-branch

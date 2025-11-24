@@ -118,15 +118,15 @@ jobs:
         with:
           enable-cache: true
 
-      # - name: install pre-commit
-      #   run: uv tool install pre-commit --with pre-commit-uv --python ${{ matrix.python-version }}
-      #   shell: bash
-
-      - name: cache pre-commit cache
+      - name: save prek cache
+        # - name: save pre-commit cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pre-commit
-          key: precommit | ${{ matrix.python-version }} | ${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+          # path: ~/.cache/pre-commit
+          path: ~/.cache/prek
+          key: prek | ${{ matrix.os }} | ${{ matrix.python-version }} | ${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line rule:line-length
+          restore-keys: |
+            prek | ${{ matrix.os }} | ${{ matrix.python-version }}
 
       - name: run pre-commit on changed files
         id: run-precommit
@@ -134,6 +134,7 @@ jobs:
         env:
           SKIP: nox-tests
           CHANGED_FILES: ${{ needs.prepare.outputs.changed_files }}
+          # uvx pre-commit --with pre-commit-uv --python ${{ matrix.python-version }} -- \
         run: |
           # Validate file list exists is not empty
           if [ -z "$CHANGED_FILES" ]; then
@@ -143,7 +144,8 @@ jobs:
 
           mapfile -t files_array <<< "$CHANGED_FILES"
 
-          uvx pre-commit --with pre-commit-uv --python ${{ matrix.python-version }} -- \
+          echo "pre_commit_ran=true" >> $GITHUB_OUTPUT
+          uvx prek --python ${{ matrix.python-version }} -- \
             run \
             --show-diff-on-failure \
             --color=always \
@@ -151,7 +153,9 @@ jobs:
         shell: bash
 
       - name: check for files modified by pre-commit
-        if: steps.run-precommit.outcome == 'failure'
+        if: |
+          steps.run-precommit.outcome == 'failure' &&
+          steps.run-precommit.outputs.pre_commit_ran == 'true'
         id: modified
         run: |
           git_status=$(git status --porcelain)
