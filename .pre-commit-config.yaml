@@ -147,40 +147,40 @@ repos:
       - id: vulture
         args: ["testmodule/", "tests/"]
 
-# Disabled: using ruff
-# - repo: https://github.com/pycqa/flake8
-#   rev: '7.3.0'
-#   hooks:
-#   - id: flake8
+  # Run limited local tests with nox
+  - repo: local
+    # Disabled: using ruff
+    # - repo: https://github.com/pycqa/flake8
+    #   rev: '7.3.0'
+    #   hooks:
+    #   - id: flake8
 
-# Disabled for now:
-# * it cannot work with YAML anchors
-# * shellcheck had trouble running
-# mostly copied it from ruff(?) pre-commit config
-# `actionlint` verifies correct syntax in GitHub Actions workflows
-# - repo: https://github.com/rhysd/actionlint
-#   rev: v1.7.7
-#   hooks:
-#     - id: actionlint
-#       # stages:
-#       #   - manual  # too slow to run by default?
-#       # args:
-#       #   - "-ignore=SC2129" # ignorable stylistic lint from shellcheck
-#       #   - "-ignore=SC2016" # another shellcheck lint: false positives?
-#       additional_dependencies:
-#         # actionlint has a shellcheck integration which extracts
-#         # shellscripts in `run:` steps from GitHub Actions and checks
-#         # these with shellcheck. This works if shellcheck is installed.
-#         - "github.com/wasilibs/go-shellcheck/cmd/shellcheck@v0.10.0"
+    # Disabled for now:
+    # * it cannot work with YAML anchors
+    # * shellcheck had trouble running
+    # mostly copied it from ruff(?) pre-commit config
+    # `actionlint` verifies correct syntax in GitHub Actions workflows
+    # - repo: https://github.com/rhysd/actionlint
+    #   rev: v1.7.7
+    #   hooks:
+    #     - id: actionlint
+    #       # stages:
+    #       #   - manual  # too slow to run by default?
+    #       # args:
+    #       #   - "-ignore=SC2129" # ignorable stylistic lint from shellcheck
+    #       #   - "-ignore=SC2016" # another shellcheck lint: false positives?
+    #       additional_dependencies:
+    #         # actionlint has a shellcheck integration which extracts
+    #         # shellscripts in `run:` steps from GitHub Actions and checks
+    #         # these with shellcheck. This works if shellcheck is installed.
+    #         - "github.com/wasilibs/go-shellcheck/cmd/shellcheck@v0.10.0"
 
-# Run limited local tests with nox
-# - repo: local
-#   hooks:
-#     - id: nox-tests
-#       name: Quick tests with nox
-#       entry: nox
-#       args: ["-t", "pre-commit"]
-#       language: system
-#       pass_filenames: false
-#       types: [python]
-#       # verbose: true
+    hooks:
+      - id: nox-tests
+        name: Quick tests with nox
+        entry: nox
+        args: ["-t", "pre-commit"]
+        language: system
+        pass_filenames: false
+        types: [python]
+        # verbose: true
