@@ -93,7 +93,7 @@ jobs:
 
   precommit:
     name: |
-      pre-commit checks on changed files (python ${{ matrix.python-version }} on ${{ matrix.os }})
+      pre-commit checks with prek (changed files only)
     needs: prepare
     runs-on: ubuntu-latest
     if: |
