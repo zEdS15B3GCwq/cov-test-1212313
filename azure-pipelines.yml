@@ -1,0 +1,59 @@
+---
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: $(imageName)
+
+strategy:
+  matrix:
+    Windows_Python312:
+      imageName: 'windows-latest'
+      python.version: '3.12'
+    Windows_Python313:
+      imageName: 'windows-latest'
+      python.version: '3.13'
+    Windows_Python314:
+      imageName: 'windows-latest'
+      python.version: '3.14'
+    macOS_Python312:
+      imageName: 'macOS-latest'
+      python.version: '3.12'
+    macOS_Python313:
+      imageName: 'macOS-latest'
+      python.version: '3.13'
+    macOS_Python314:
+      imageName: 'macOS-latest'
+      python.version: '3.14'
+
+steps:
+  - checkout: self
+    persistCredentials: "false"
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      curl -LsSf https://astral.sh/uv/install.sh | sh
+      echo "##vso[task.prependpath]$HOME/.cargo/bin"
+    displayName: 'Install uv (macOS/Linux)'
+    condition: ne(variables['Agent.OS'], 'Windows_NT')
+
+  - script: |
+      powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+      echo "##vso[task.prependpath]%USERPROFILE%\.cargo\bin"
+    displayName: 'Install uv (Windows)'
+    condition: eq(variables['Agent.OS'], 'Windows_NT')
+
+  - script: |
+      uvx nox -s tests --force-python $(python.version)
+    displayName: 'Run tests'
