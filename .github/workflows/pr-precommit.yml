@@ -232,12 +232,11 @@ jobs:
         shell: bash
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        # gh auth setup-git
         run: |
-          echo "Pre-commit made changes, committing and pushing..."
-          git config user.name "pre-commit-bot[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # gh auth setup-git
           git add .
           git commit -m "[pre-commit] automatic fixes"
           git push origin "HEAD:refs/heads/${HEAD_REF}"
