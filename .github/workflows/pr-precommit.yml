@@ -29,29 +29,34 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const pr = context.payload.pull_request;
-
-            // Check the latest commit author
-            const commits = await github.rest.pulls.listCommits({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number
-            });
-
-            const latestCommit = commits.data[commits.data.length - 1];
-            const author = latestCommit.author;
-            const committer = latestCommit.committer;
-
-            const isBot =
-              committer?.type === 'Bot' ||
-              author?.type === 'Bot' ||
-              (committer?.login || '').includes('[bot]') ||
-              (author?.login || '').includes('[bot]');
+            // Check if this workflow was triggered by our GitHub App
+            const isBot = context.actor === 'pre-commit-bot[bot]';
             core.setOutput("is_bot", isBot.toString());
-            // console.log(`Latest commit SHA: ${latestCommit.sha}`);
-            // console.log(`Committer: ${committer?.login} (type: ${committer?.type})`);
-            // console.log(`Author: ${author?.login} (type: ${author?.type})`);
-            // console.log(`Is bot: ${isBot}`);
+            console.log(`Context actor: ${context.actor} is bot: ${isBot}`);
+          # script: |
+          #   const pr = context.payload.pull_request;
+
+          #   // Check the latest commit author
+          #   const commits = await github.rest.pulls.listCommits({
+          #     owner: context.repo.owner,
+          #     repo: context.repo.repo,
+          #     pull_number: pr.number
+          #   });
+
+          #   const latestCommit = commits.data[commits.data.length - 1];
+          #   const author = latestCommit.author;
+          #   const committer = latestCommit.committer;
+
+          #   const isBot =
+          #     committer?.type === 'Bot' ||
+          #     author?.type === 'Bot' ||
+          #     (committer?.login || '').includes('[bot]') ||
+          #     (author?.login || '').includes('[bot]');
+          #   core.setOutput("is_bot", isBot.toString());
+          #   // console.log(`Latest commit SHA: ${latestCommit.sha}`);
+          #   // console.log(`Committer: ${committer?.login} (type: ${committer?.type})`);
+          #   // console.log(`Author: ${author?.login} (type: ${author?.type})`);
+          #   // console.log(`Is bot: ${isBot}`);
 
       - name: check if PR is from a fork
         id: check-fork
@@ -88,7 +93,7 @@ jobs:
 
   precommit:
     name: |
-      pre-commit checks on changed files (python ${{ matrix.python-version }} on ${{ matrix.os }})
+      pre-commit checks with prek (changed files only)
     needs: prepare
     runs-on: ubuntu-latest
     if: |
@@ -227,12 +232,11 @@ jobs:
         shell: bash
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        # gh auth setup-git
         run: |
-          echo "Pre-commit made changes, committing and pushing..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # gh auth setup-git
           git add .
           git commit -m "[pre-commit] automatic fixes"
           git push origin "HEAD:refs/heads/${HEAD_REF}"
