@@ -50,14 +50,14 @@ jobs:
         run: python ${{ github.workspace }}/.github/scripts/extract_coverage.py
 
       - name: upload coverage badge
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-badge
           path: badges/coverage.json
           if-no-files-found: error
 
       - name: upload coverage HTML report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-html
           path: htmlcov/
@@ -67,7 +67,7 @@ jobs:
         run: uvx nox -s docs --force-python ${{ matrix.python-version }}
 
       - name: upload documnentation HTML
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: documentation-html
           path: ./docs/_build/html
