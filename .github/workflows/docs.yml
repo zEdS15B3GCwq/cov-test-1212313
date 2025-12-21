@@ -82,19 +82,19 @@ jobs:
       id-token: write
     steps:
       - name: download documentation HTML artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: documentation-html
           path: ./html
 
       - name: download coverage badge artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: coverage-badge
           path: ./html/badges
 
       - name: download coverage HTML report artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: coverage-html
           path: ./html/htmlcov
