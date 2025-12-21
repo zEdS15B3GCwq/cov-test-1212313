@@ -125,7 +125,7 @@ jobs:
 
       - name: save prek cache
         # - name: save pre-commit cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # path: ~/.cache/pre-commit
           path: ~/.cache/prek
@@ -187,7 +187,7 @@ jobs:
 
       - name: upload modified files as artifact
         if: steps.modified.outputs.changes == 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.artifact-name.outputs.name }}
           path: |
